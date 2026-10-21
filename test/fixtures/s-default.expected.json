@@ -1,0 +1,226 @@
+{
+ "C": {
+  "st": "Hà Nội",
+  "reg": "Đồng bằng Bắc Bộ",
+  "lat": 21.03,
+  "lon": 105.8,
+  "z": 5,
+  "mH": 6,
+  "mD": 1,
+  "tab": {
+   "tNh": 33.4,
+   "phiH": 80,
+   "tNtb": 29.3,
+   "tNd": 14.5,
+   "phiD": 79.9,
+   "vH": 2.5,
+   "dirH": "DN",
+   "vD": 2.9,
+   "dirD": "DB"
+  },
+  "wH": {
+   "st": "Hà Nội",
+   "d": 0,
+   "dir": "DN",
+   "P": 34.2,
+   "v": 2.5,
+   "calm": 17.1
+  },
+  "wD": {
+   "st": "Hà Nội",
+   "d": 0,
+   "dir": "DB",
+   "P": 27.4,
+   "v": 2.9,
+   "calm": 20
+  },
+  "noTavg": false,
+  "tNh": 33.4,
+  "phiH": 80,
+  "tNtb": 29.3,
+  "tNd": 14.5,
+  "phiD": 79.9,
+  "src": {
+   "tNh": false,
+   "phiH": false,
+   "tNtb": false,
+   "tNd": false,
+   "phiD": false,
+   "vH": false,
+   "vD": false,
+   "dirH": false,
+   "dirD": false
+  },
+  "dH": 26.301013375681727,
+  "dD": 8.189543751463207,
+  "dTh": 1,
+  "tTh": 34.4,
+  "tTd": 20,
+  "vH": 2.5,
+  "vD": 2.9,
+  "dirH": "DN",
+  "dirD": "DB",
+  "labor": "vua",
+  "warn": [
+   "Nhiệt độ trong nhà mùa hè t_T = 34.4 °C vượt 34 °C (giáo trình Bảng 2.1: t_T không quá 34 °C; vùng có t_N > 33 °C được lấy cao hơn nhưng phải tăng vận tốc gió trong vùng làm việc – mỗi 1 °C tăng 0,5 ÷ 0,8 m/s, không quá 2,5 m/s). Kiểm tra lại ô chênh nhiệt mùa hè."
+  ]
+ },
+ "E": {
+  "cons": {},
+  "els": [],
+  "fl": {
+   "on": false,
+   "bands": []
+  },
+  "err": [],
+  "warn": []
+ },
+ "LH": {
+  "tT": 34.4,
+  "tN": 33.4,
+  "dt": 1,
+  "rows": [],
+  "Qk": 0,
+  "Qb": 0,
+  "infRows": [],
+  "Qinf": 0,
+  "v": 2.5,
+  "wd": "DN",
+  "tot": 0
+ },
+ "LD": {
+  "tT": 20,
+  "tN": 14.5,
+  "dt": 5.5,
+  "rows": [],
+  "Qk": 0,
+  "Qb": 0,
+  "infRows": [],
+  "Qinf": 0,
+  "v": 2.9,
+  "wd": "DB",
+  "tot": 0
+ },
+ "GH": {
+  "tT": 34.4,
+  "Fs": 0,
+  "Nts": 0,
+  "e1": 0.5,
+  "e2": 0.94,
+  "Qts": 0,
+  "mot": [],
+  "Nm": 0,
+  "phi": 0.25,
+  "Qdc": 0,
+  "nP": 0,
+  "qn": 200,
+  "Qng": 0,
+  "oth": [],
+  "Qoth": 0,
+  "tot": 0
+ },
+ "GD": {
+  "tT": 20,
+  "Fs": 0,
+  "Nts": 0,
+  "e1": 0.5,
+  "e2": 0.94,
+  "Qts": 0,
+  "mot": [],
+  "Nm": 0,
+  "phi": 0.25,
+  "Qdc": 0,
+  "nP": 0,
+  "qn": 205,
+  "Qng": 0,
+  "oth": [],
+  "Qoth": 0,
+  "tot": 0
+ },
+ "SO": {
+  "stn": "Hà Nội",
+  "stD": 0,
+  "auto": true,
+  "s18": "Hà Nội",
+  "s18D": 0,
+  "m": 6,
+  "mon": "VI",
+  "slot": 7,
+  "hour": 13,
+  "tau": [
+   0.9,
+   0.8,
+   0.75,
+   0.95
+  ],
+  "tp": 0.513,
+  "win": [],
+  "Qwin": 0,
+  "Fm": 0,
+  "Km": 0,
+  "rho": 0.65,
+  "aN": 23.26,
+  "aT": 8.72,
+  "qday": 6198,
+  "qdayT": 6198,
+  "qtb": 258.25,
+  "qmax": 734.3560238789538,
+  "qmaxT": 734.3560238789538,
+  "N": 13.25759620251927,
+  "warn": [],
+  "Qroof": 0,
+  "noRoof": true,
+  "tot": 0,
+  "psiPH": null
+ },
+ "V": {
+  "QthH": 0,
+  "QthD": 0,
+  "Qth": 0,
+  "useH": true,
+  "tvlv": 34.4,
+  "a": 1,
+  "h0": 0,
+  "hv": 2,
+  "tR": 32.4,
+  "tV": 33.4,
+  "Cp": 1.005,
+  "warn": [
+   "Nhiệt độ không khí ra t_R phải lớn hơn nhiệt độ thổi vào t_V – kiểm tra chiều cao h₀ và hệ số a"
+  ],
+  "G": null,
+  "nOutPlan": null
+ },
+ "H": {
+  "tAir": null,
+  "rho": null,
+  "beta": null,
+  "K": null,
+  "qOut": null,
+  "nOutTot": null,
+  "segs": [],
+  "err": [
+   "Phương án TG: Chưa vạch tuyến ống"
+  ],
+  "warn": []
+ },
+ "FN": null,
+ "P": {
+  "err": [
+   "Chưa vạch tuyến ống"
+  ],
+  "warn": [],
+  "segs": [],
+  "suct": null,
+  "label": {},
+  "geo": [],
+  "nOut": 0,
+  "nodeZ": {},
+  "bends": {
+   "h": 0,
+   "v": 0
+  },
+  "empty": true
+ },
+ "CK": {}
+}
