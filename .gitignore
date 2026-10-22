@@ -1,4 +1,8 @@
+/target/
 node_modules/
-.wrangler/
-.dev.vars
-test/fixtures/*.raw.json
+fixtures/*.raw.json
+src-tauri/gen/schemas/
+.DS_Store
+web/vendor/fonts/
+src-tauri/icons/*.png
+src-tauri/icons/*.ico

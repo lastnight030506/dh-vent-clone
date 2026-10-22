@@ -1,17 +1,16 @@
-# API and engine contract
+# Engine contract
 
-The client (`public/index.html`) only talks to three endpoints. Responses are
-plain JSON; the client's `DHV.unpack` passes already-plain objects through, so
-the local server returns the engine result directly (the live server sends a
-`§r`/`§g` packed form instead).
+The UI is unchanged: it calls `DH.compute(input)` and expects the same response
+envelope the web API used to return. In the desktop app that call is a Tauri
+command, not HTTP.
 
-## POST /api/vent/compute
+## Command
 
-```json
-{ "input": { ...project state... }, "code": "optional", "dev": "optional" }
+```js
+window.__TAURI__.core.invoke('compute', { input })
 ```
 
-Response:
+`input` is the UI's project object (`S`). Response:
 
 ```json
 { "mode": "free", "full": true, "teach": false,
@@ -20,16 +19,12 @@ Response:
            "SO": {}, "V": {}, "H": {}, "FN": null, "P": {}, "CK": {} } }
 ```
 
-On a thrown error the server returns the same envelope plus `error` (string)
-and no `res`; the client shows a toast.
-
-`GET /api/vent/meta` returns the same envelope, minus `res`/`error`.
-`POST /api/check-code` returns `{"status":"valid", ...}` locally; the live app
-uses it to unlock a licence.
+`engine::compute_value` returns `res` or an `Err(String)`; the shell surfaces the
+error as a rejected promise.
 
 ## Input
 
-The project object is the client's `S`. Fields the engine reads:
+The project object is serialised as-is. Fields the engine reads:
 
 | Area | Fields |
 | --- | --- |
@@ -40,9 +35,10 @@ The project object is the client's `S`. Fields the engine reads:
 | Solar | `sol{st,m,slot,t1..t4,q{dir},qday,qmax,psi,z,nuMode,nu,rho}` |
 | Flow | `vent{tvlv,a,h0,hv,tV,nOut}` |
 
-Unknown station names fall back to Hà Nội, as on the live server.
+Numeric cells may be numbers, numeric strings, or `""` (empty). Unknown station
+names and an empty `st` fall back to Hà Nội. Unknown fields are ignored.
 
-## Engine sections
+## Output sections
 
 - `C` — resolved climate: `tNh tNd tNtb tTh tTd vH vD dirH dirD`, moisture
   `dH dD`, `warn[]` (t_T > 34 °C, no cold season).
@@ -53,19 +49,34 @@ Unknown station names fall back to Hà Nội, as on the live server.
   zero totals when `tNd >= tTd`.
 - `GH` / `GD` — gains per season: lighting, motors, people, `others`.
 - `SO` — solar: station, month, transmittance product, per-direction windows,
-  roof absorption (`psi`, `nu`, `Attg`, `QA`), `psiPH` is the interpolated ψ
+  roof absorption (`psi`, `nu`, `Attg`, `QA`). `psiPH` is the interpolated ψ
   even when the user typed one.
 - `V` — excess heat, airflow `G`, `L` (m³/h), air changes `n`.
-- `H`, `FN`, `P`, `CK` — duct plan/fan/check outputs. Empty stubs; the live
-  server has these tabs off for this licence and returns the same shape.
+- `H`, `FN`, `P`, `CK` — duct plan/fan/check outputs. Empty stubs; those tabs
+  are off in the live app for this project and return the same shape.
+
+Fields that the JavaScript engine omitted (`undefined`) are omitted here; fields
+that were explicitly `null` remain `null`. Parity tests compare key sets exactly.
+
+## Module map
+
+| File | Responsibility |
+| --- | --- |
+| `engine/src/climate.rs` | station lookup, overrides, design temperatures, warnings |
+| `engine/src/envelope.rs` | layer resistance `Ro/K/D`, element net areas, floor bands |
+| `engine/src/losses.rs` | transmission + infiltration losses for one season |
+| `engine/src/gains.rs` | lighting/motors/people/other gains for both seasons |
+| `engine/src/solar.rs` | solar stations, day length, ψ/ν, roof and window gains |
+| `engine/src/vent.rs` | excess heat, airflow, air changes |
+| `engine/src/util.rs` | JS-compatible numeric parsing, windward, ψ interpolation |
+| `engine/src/data.rs` | embedded JSON tables, parsed once |
+| `engine/src/input.rs` / `output.rs` | serde contract |
 
 ## Parity harness
 
-`test/compare.mjs <fixture> [relTol]` deep-compares `compute(input)` with an
-unpacked live response. `test/all.mjs` runs every fixture. Fixtures whose
-`.raw.json` is absent can be re-captured with
-`DH_CODE=... node test/oracle.mjs <fixture>`; `DH_DEV` overrides the device id.
+`cargo test -p engine` runs `engine/tests/parity.rs` over every
+`fixtures/*.input.json`, comparing with `*.expected.json` at
+`max(1e-9 absolute, 1e-6 relative)` and exact key sets.
 
-Recovered formulas, constants and defaults are documented in the engine source
-next to their use (R_o/K, floor bands, wind uplift, infiltration table 2.5,
-q_n curves, day length, ψ interpolation).
+Fixtures whose `.raw.json` is absent can be re-captured with
+`DH_CODE=... node tools/oracle.mjs <fixture>`; `DH_DEV` overrides the device id.

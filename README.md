@@ -1,67 +1,72 @@
-# DH-VENT clone
+# DH-VENT
 
-Offline clone of the Vietnamese industrial-ventilation calculator at
-`https://dh-tools.huanbachkhoa.workers.dev/vent` (DH Engineering Tools, DH-VENT).
+Windows desktop app for the Vietnamese industrial-ventilation calculator
+**DH-VENT** (DH Engineering Tools). The UI is the original web client; every
+calculation runs in Rust, locally, with no network and no access code.
 
-The live page ships the whole UI but keeps every calculation on the server.
-This repo reimplements that server side (`src/engine.js`), serves the original
-client bytes unchanged, and reproduces the API, so the app runs locally with no
-network and no access code.
+## What is inside
+
+| Path | Purpose |
+| --- | --- |
+| `web/` | Original single-page UI. Licence/access-code screen removed; PDF libraries and fonts are vendored so exports work offline. |
+| `engine/` | Rust calculation engine (climate, envelope, losses, gains, solar, airflow). |
+| `src-tauri/` | Tauri 2 shell: one `compute` command, Windows installer metadata and icons. |
+| `fixtures/` | 11 input/output pairs captured from the live endpoint. |
+| `tools/` | Optional live-capture scripts (need an access code; not used by the app). |
+| `docs/CONTRACT.md` | Input/output field contract and module map. |
 
 ## Status
 
-- Engine output matches the live endpoint on 11 captured scenarios (843, 673,
-  427, … fields each, relative tolerance 1e-6) — see `test/fixtures/`.
-- The page loads in Chromium against the local API and renders results
-  (checked end to end with `R.V.L = 81743.6596…` for `scenario1`).
-- Duct tabs (`tP`, `t7`, `t8`, `t9`) are switched off exactly as on the live
-  app for this licence; that engine is not reimplemented.
-- Licensing is not reproduced: every access code is accepted locally.
+- **11/11 oracle fixtures match** at relative tolerance `1e-6`
+  (`cargo test -p engine`).
+- Verified end to end in the Tauri app: the default project is computed by the
+  Rust engine and rendered in the UI (Linux build under Xvfb).
+- Duct tabs (`tP`, `t7`, `t8`, `t9`) are switched off exactly as in the live app
+  for this project; their engine (`H`, `P`, `FN`, `CK`) remains a no-plan stub.
+- No licence logic: `mode` is always `free`, every feature is unlocked.
 
-## Run
+## Build
 
-No dependencies needed:
-
-```sh
-node dev.mjs            # http://localhost:8787/vent
-```
-
-Deploy to Cloudflare Workers (static page from `public/`, API from `worker.js`):
+Rust 1.77+.
 
 ```sh
-npm install && npx wrangler deploy
+cargo test -p engine      # parity suite
+cargo run -p dh-vent      # desktop app (Linux needs webkit2gtk-4.1 and gtk3)
+cargo tauri build         # installer for the current OS
 ```
 
-## Layout
-
-```
-public/index.html   original client, byte-for-byte
-src/engine.js       ventilation engine (climate, envelope, gains, solar, flow)
-src/api.js          /api/vent/meta, /api/vent/compute, /api/check-code
-worker.js           Worker entry (API only; assets serve the page)
-dev.mjs             local Node server with the same API
-src/data/*.json     harvested station/climate/ψ tables
-src/data/*.js       generated ES modules (scripts/build-data.mjs)
-scripts/            data harvest + probe tools (need DH_CODE)
-test/               oracle capture, unpacker, deep-diff, fixtures
-docs/CONTRACT.md    request/response and engine-field contract
-```
+Windows installers are built by GitHub Actions on every push to `main`
+(`.github/workflows/windows.yml`). Download the `dh-vent-windows` artifact from
+the run, or build on Windows with:
 
 ```sh
-node test/all.mjs                              # all fixtures vs engine
-DH_CODE=... node test/oracle.mjs <name>        # re-capture from the live API
+cargo install tauri-cli --version "^2" --locked
+cargo tauri build
 ```
 
-`test/fixtures/*.expected.json` are unpacked live responses; `*.input.json`
-are the inputs sent to the engine.
+Outputs: `target/release/bundle/msi/DH-VENT_1.0.0_x64_en-US.msi` and
+`target/release/bundle/nsis/DH-VENT_1.0.0_x64-setup.exe`.
 
-## Provenance
+## Extending
+
+- **Add a calculation field**: add it to `engine/src/input.rs` (input) and
+  `engine/src/output.rs` (result), then compute it in the matching module.
+  Unknown input fields are ignored, so old clients keep working.
+- **Add a section**: create `engine/src/<name>.rs`, wire it in `engine/src/lib.rs`
+  and add the struct to `Output`. The UI reads results by key, so a new key can
+  be rendered without touching the engine.
+- **Update reference data**: edit `engine/data/{catalog,climate,psi-table}.json`.
+  Data is embedded at compile time; no code generation step.
+- **Recapture an oracle fixture**: `DH_CODE=... node tools/oracle.mjs <name>`
+  writes `fixtures/<name>.{raw,expected}.json`; then run `cargo test -p engine`.
+
+## Data and provenance
 
 - Station normals: QCVN 02:2022/BXD tables A.2/A.3/A.4/A.10/A.16 (152 stations).
 - Solar: daily totals per month for the 13 radiation stations (A.18).
 - ψ: Bảng 2.10 grid, interpolated bilinearly.
-- Formulas and defaults were recovered from the page's calculation notes and
-  by probing the live compute endpoint; `docs/CONTRACT.md` records the result.
+- Formulas and defaults were recovered from the page's calculation notes and by
+  probing the live compute endpoint; `engine/src` documents each stage.
 
 Original app, data and texts © Nguyễn Đình Huấn (ndhuan@dut.udn.vn). This is a
 private study copy, not affiliated with or endorsed by the author.
