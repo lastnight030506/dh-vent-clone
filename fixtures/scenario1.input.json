@@ -1,0 +1,51 @@
+{
+  "ver": 4,
+  "project": "Xưởng cơ khí A",
+  "st": "Đà Nẵng",
+  "mH": "", "mD": "", "tNh": "", "phiH": "", "tNtb": "", "tNd": "", "phiD": "",
+  "dTh": 1, "tTd": 20, "labor": "vua", "vH": "", "dirH": "", "vD": "", "dirD": "",
+  "bA": 36, "bB": 24, "bH": 7.5, "floorOn": true, "floorIns": [], "roofSummer": false,
+  "cons": [
+    { "id": "tuong", "name": "Tường", "aT": 8.72, "aN": 23.26, "layers": [
+      { "n": "Vữa xi măng", "d": 15, "lam": 0.93, "s": 10.13 },
+      { "n": "Gạch phổ thông xây với vữa nặng", "d": 200, "lam": 0.81, "s": 9.67 },
+      { "n": "Vữa xi măng", "d": 15, "lam": 0.93, "s": 10.13 }
+    ] },
+    { "id": "kinh", "name": "Cửa kính", "aT": 8.72, "aN": 23.26, "layers": [
+      { "n": "Kính cửa sổ", "d": 5, "lam": 0.76, "s": 10.79 }
+    ] },
+    { "id": "thep", "name": "Cửa đi", "aT": 8.72, "aN": 23.26, "layers": [
+      { "n": "Thép", "d": 5, "lam": 58, "s": 126.2 }
+    ] },
+    { "id": "mai", "name": "Mái", "aT": 8.72, "aN": 23.26, "layers": [
+      { "n": "Tấm cách nhiệt ximăng amian", "d": 50, "lam": 0.13, "s": 2 }
+    ] }
+  ],
+  "els": [
+    { "k": "tuong", "dir": "B", "a": 36, "b": 7.5, "n": 1, "con": "tuong", "psi": 1 },
+    { "k": "tuong", "dir": "N", "a": 36, "b": 7.5, "n": 1, "con": "tuong", "psi": 1 },
+    { "k": "tuong", "dir": "D", "a": 24, "b": 7.5, "n": 1, "con": "tuong", "psi": 1 },
+    { "k": "tuong", "dir": "T", "a": 24, "b": 7.5, "n": 1, "con": "tuong", "psi": 1 },
+    { "k": "cuaso", "dir": "D", "a": 2.4, "b": 1.8, "n": 6, "con": "kinh", "inf": 0.65, "cr": "kl" },
+    { "k": "cuaso", "dir": "T", "a": 2.4, "b": 1.8, "n": 6, "con": "kinh", "inf": 0.65, "cr": "kl" },
+    { "k": "cuadi", "dir": "B", "a": 3, "b": 3.6, "n": 2, "con": "thep", "inf": 2, "cr": "kl" },
+    { "k": "mai", "dir": "N", "a": 36, "b": 12.4, "n": 1, "con": "mai", "psi": 1 },
+    { "k": "mai", "dir": "B", "a": 36, "b": 12.4, "n": 1, "con": "mai", "psi": 1 }
+  ],
+  "infL": {},
+  "light": { "mode": "a", "a": 20, "F": "", "e1": 0.5, "e2": 0.94 },
+  "phiM": 0.25,
+  "motors": [
+    { "name": "Máy tiện", "n": 4, "kW": 7.5 },
+    { "name": "Máy nén khí", "n": 2, "kW": 22 }
+  ],
+  "nPeople": 45,
+  "others": [],
+  "sol": { "st": "", "m": "7", "slot": 7, "t1": 0.9, "t2": 0.8, "t3": 0.75, "t4": 0.95, "q": {}, "rho": 0.65, "z": 1, "nuMode": "input", "nu": "" },
+  "vent": { "a": 1, "h0": 4, "hv": 2, "nOut": 2 },
+  "duct": { "t": "", "K": 0.1, "qOut": "", "vmin": 5, "vmax": 12, "dPeq": 0, "main": "far", "teeM": "ide45" },
+  "plan": null,
+  "segs": [],
+  "suct": [],
+  "fan": { "kL": 1.1, "kP": 1.1, "eta": 0.7, "etaTr": 0.97, "etaTd": 1, "K": 1.1 }
+}

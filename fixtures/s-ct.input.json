@@ -1,0 +1,135 @@
+{
+ "ver": 3,
+ "project": "S3",
+ "st": "Cần Thơ",
+ "mH": "",
+ "mD": "",
+ "tNh": "",
+ "phiH": "",
+ "tNtb": "",
+ "tNd": "",
+ "phiD": "",
+ "dTh": 2,
+ "tTd": 24,
+ "labor": "nhe",
+ "vH": "",
+ "dirH": "",
+ "vD": "",
+ "dirD": "",
+ "bA": 30,
+ "bB": 18,
+ "bH": 6,
+ "floorOn": true,
+ "floorIns": [],
+ "roofSummer": false,
+ "cons": [
+  {
+   "id": "tuong",
+   "name": "Tường",
+   "aT": 8.72,
+   "aN": 23.26,
+   "layers": [
+    {
+     "n": "",
+     "d": "",
+     "lam": "",
+     "s": ""
+    }
+   ]
+  },
+  {
+   "id": "kinh",
+   "name": "Cửa kính",
+   "aT": 8.72,
+   "aN": 23.26,
+   "layers": [
+    {
+     "n": "",
+     "d": "",
+     "lam": "",
+     "s": ""
+    }
+   ]
+  },
+  {
+   "id": "thep",
+   "name": "Cửa đi",
+   "aT": 8.72,
+   "aN": 23.26,
+   "layers": [
+    {
+     "n": "",
+     "d": "",
+     "lam": "",
+     "s": ""
+    }
+   ]
+  },
+  {
+   "id": "mai",
+   "name": "Mái",
+   "aT": 8.72,
+   "aN": 23.26,
+   "layers": [
+    {
+     "n": "",
+     "d": "",
+     "lam": "",
+     "s": ""
+    }
+   ]
+  }
+ ],
+ "els": [],
+ "infL": {},
+ "light": {
+  "mode": "a",
+  "a": 18,
+  "F": 500,
+  "e1": 0.7,
+  "e2": 0.92
+ },
+ "phiM": 0.25,
+ "motors": [
+  {
+   "name": "",
+   "n": 1,
+   "kW": ""
+  }
+ ],
+ "nPeople": 60,
+ "others": [],
+ "sol": {
+  "m": "10",
+  "slot": 10,
+  "rho": 0.65,
+  "z": 2
+ },
+ "vent": {
+  "a": 1,
+  "h0": 3,
+  "hv": 2,
+  "nOut": 1
+ },
+ "duct": {
+  "t": "",
+  "K": 0.1,
+  "qOut": "",
+  "vmin": 5,
+  "vmax": 12,
+  "dPeq": 0,
+  "main": "far",
+  "teeM": "ide45"
+ },
+ "plan": null,
+ "segs": [],
+ "suct": [],
+ "fan": {
+  "kL": 1.1,
+  "kP": 1.1,
+  "eta": "",
+  "etaTr": 0.97,
+  "etaTd": 1,
+  "K": 1.1
+ }
+}

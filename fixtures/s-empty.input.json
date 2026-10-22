@@ -1,0 +1,143 @@
+{
+ "ver": 3,
+ "project": "",
+ "st": "Đà Nẵng",
+ "mH": "",
+ "mD": "",
+ "tNh": "",
+ "phiH": "",
+ "tNtb": "",
+ "tNd": "",
+ "phiD": "",
+ "dTh": 1,
+ "tTd": 20,
+ "labor": "vua",
+ "vH": "",
+ "dirH": "",
+ "vD": "",
+ "dirD": "",
+ "bA": "",
+ "bB": "",
+ "bH": "",
+ "floorOn": true,
+ "floorIns": [],
+ "roofSummer": false,
+ "cons": [
+  {
+   "id": "tuong",
+   "name": "Tường",
+   "aT": 8.72,
+   "aN": 23.26,
+   "layers": [
+    {
+     "n": "",
+     "d": "",
+     "lam": "",
+     "s": ""
+    }
+   ]
+  },
+  {
+   "id": "kinh",
+   "name": "Cửa kính",
+   "aT": 8.72,
+   "aN": 23.26,
+   "layers": [
+    {
+     "n": "",
+     "d": "",
+     "lam": "",
+     "s": ""
+    }
+   ]
+  },
+  {
+   "id": "thep",
+   "name": "Cửa đi",
+   "aT": 8.72,
+   "aN": 23.26,
+   "layers": [
+    {
+     "n": "",
+     "d": "",
+     "lam": "",
+     "s": ""
+    }
+   ]
+  },
+  {
+   "id": "mai",
+   "name": "Mái",
+   "aT": 8.72,
+   "aN": 23.26,
+   "layers": [
+    {
+     "n": "",
+     "d": "",
+     "lam": "",
+     "s": ""
+    }
+   ]
+  }
+ ],
+ "els": [],
+ "infL": {},
+ "light": {
+  "mode": "a",
+  "a": "",
+  "F": "",
+  "e1": 0.5,
+  "e2": 0.94
+ },
+ "phiM": 0.25,
+ "motors": [
+  {
+   "name": "",
+   "n": 1,
+   "kW": ""
+  }
+ ],
+ "nPeople": "",
+ "others": [],
+ "sol": {
+  "st": "",
+  "m": "",
+  "slot": 7,
+  "t1": 0.9,
+  "t2": 0.8,
+  "t3": 0.75,
+  "t4": 0.95,
+  "q": {},
+  "rho": "",
+  "z": 1,
+  "nuMode": "input",
+  "nu": ""
+ },
+ "vent": {
+  "a": 1,
+  "h0": "",
+  "hv": 2,
+  "nOut": ""
+ },
+ "duct": {
+  "t": "",
+  "K": 0.1,
+  "qOut": "",
+  "vmin": 5,
+  "vmax": 12,
+  "dPeq": 0,
+  "main": "far",
+  "teeM": "ide45"
+ },
+ "plan": null,
+ "segs": [],
+ "suct": [],
+ "fan": {
+  "kL": 1.1,
+  "kP": 1.1,
+  "eta": "",
+  "etaTr": 0.97,
+  "etaTd": 1,
+  "K": 1.1
+ }
+}
