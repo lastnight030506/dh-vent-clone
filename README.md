@@ -3,6 +3,20 @@
 Desktop app for the Vietnamese industrial-ventilation calculator **VENT**.
 Every calculation runs in Rust, locally, with no network and no access code.
 
+## Download and install (Windows)
+
+No coding required. Open the
+[latest release](https://github.com/lastnight030506/dh-vent-clone/releases/latest),
+download `VENT_1.0.0_x64-setup.exe`, and run it. If Windows SmartScreen appears,
+choose **More info → Run anyway** — the installer is not code-signed yet.
+
+Step-by-step guide (Vietnamese and English), including the `.msi` alternative:
+[docs/INSTALL-WINDOWS.md](docs/INSTALL-WINDOWS.md).
+
+> The Releases page is reachable only when this repository is public or you are
+> a collaborator. To let anyone download the installer, make the repository
+> public (Settings → General → Danger Zone → Change visibility).
+
 ## What is inside
 
 | Path | Purpose |
@@ -53,6 +67,14 @@ Outputs on Windows: `target/release/bundle/msi/VENT_1.0.0_x64_en-US.msi` and
 `target/release/bundle/nsis/VENT_1.0.0_x64-setup.exe`
 (`cargo tauri build --bundles msi,nsis`, needs the Windows WebView2 runtime,
 installed by the bundle when missing).
+
+## Publishing a release
+
+Push a tag that matches `version` in `src-tauri/tauri.conf.json` (for example
+`v1.0.0`). The build workflow compiles both platforms and attaches the Windows
+`.exe`/`.msi` and the Linux `.deb`/`.rpm`/`.AppImage` to a GitHub release named
+after the tag. Releases are downloadable by others only if the repository is
+public.
 
 ## Extending
 
