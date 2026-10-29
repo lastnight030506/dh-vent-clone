@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "DH-VENT",
+  "productName": "VENT",
   "version": "1.0.0",
-  "identifier": "vn.dhvent.app",
+  "identifier": "vn.vent.desktop",
   "build": {
     "frontendDist": "../web"
   },
@@ -10,7 +10,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "DH-VENT · Thông gió cơ khí",
+        "title": "VENT · Thông gió cơ khí",
         "width": 1440,
         "height": 900,
         "minWidth": 1100,

@@ -6,3 +6,4 @@ src-tauri/gen/schemas/
 web/vendor/fonts/
 src-tauri/icons/*.png
 src-tauri/icons/*.ico
+/dist/

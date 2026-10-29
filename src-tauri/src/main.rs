@@ -9,7 +9,7 @@ fn compute(input: serde_json::Value) -> Result<serde_json::Value, String> {
         "full": true,
         "teach": false,
         "cfg": {
-            "modes": { "tP": "off", "t7": "off", "t8": "off", "t9": "off" },
+            "modes": { "tP": "open", "t7": "open", "t8": "open", "t9": "open" },
             "tol": 3
         },
         "res": res
@@ -20,5 +20,5 @@ fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![compute])
         .run(tauri::generate_context!())
-        .expect("error while running DH-VENT");
+        .expect("error while running VENT");
 }

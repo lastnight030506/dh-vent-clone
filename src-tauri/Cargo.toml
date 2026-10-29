@@ -1,7 +1,7 @@
 [package]
-name = "dh-vent"
+name = "vent"
 version = "1.0.0"
-description = "DH-VENT – mechanical ventilation calculator"
+description = "VENT – mechanical ventilation calculator"
 edition = "2021"
 rust-version = "1.77"
 

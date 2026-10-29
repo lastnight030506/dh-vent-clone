@@ -1,4 +1,4 @@
-// Query the live DH-VENT API for a fixture input and store the raw response.
+// Query the upstream calculator API for a fixture input and store the raw response.
 //   DH_CODE=... node tools/oracle.mjs scenario1
 import fs from 'node:fs';
 import path from 'node:path';

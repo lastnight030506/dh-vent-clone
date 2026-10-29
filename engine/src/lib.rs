@@ -1,4 +1,4 @@
-//! DH-VENT calculation engine.
+//! VENT calculation engine.
 //!
 //! The public entry point is [`compute_value`], which takes the project JSON sent by the
 //! web UI and returns the result document. The modules mirror the calculation stages:

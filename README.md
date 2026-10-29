@@ -1,16 +1,15 @@
-# DH-VENT
+# VENT
 
-Windows desktop app for the Vietnamese industrial-ventilation calculator
-**DH-VENT** (DH Engineering Tools). The UI is the original web client; every
-calculation runs in Rust, locally, with no network and no access code.
+Desktop app for the Vietnamese industrial-ventilation calculator **VENT**.
+Every calculation runs in Rust, locally, with no network and no access code.
 
 ## What is inside
 
 | Path | Purpose |
 | --- | --- |
-| `web/` | Original single-page UI. Licence/access-code screen removed; PDF libraries and fonts are vendored so exports work offline. |
+| `web/` | Single-page UI. PDF libraries and fonts are vendored so exports work offline. |
 | `engine/` | Rust calculation engine (climate, envelope, losses, gains, solar, airflow). |
-| `src-tauri/` | Tauri 2 shell: one `compute` command, Windows installer metadata and icons. |
+| `src-tauri/` | Tauri 2 shell: one `compute` command, installer metadata and icons. |
 | `fixtures/` | 11 input/output pairs captured from the live endpoint. |
 | `tools/` | Optional live-capture scripts (need an access code; not used by the app). |
 | `docs/CONTRACT.md` | Input/output field contract and module map. |
@@ -21,8 +20,12 @@ calculation runs in Rust, locally, with no network and no access code.
   (`cargo test -p engine`).
 - Verified end to end in the Tauri app: the default project is computed by the
   Rust engine and rendered in the UI (Linux build under Xvfb).
-- Duct tabs (`tP`, `t7`, `t8`, `t9`) are switched off exactly as in the live app
-  for this project; their engine (`H`, `P`, `FN`, `CK`) remains a no-plan stub.
+- Tabs 7–10 (`tP` plan, `t7` hydraulics, `t8` fan, `t9` export) are enabled.
+  The plan editor, iso/net drawings, checks and the Word/Excel/PDF/DXF/PNG
+  exports are client-side and work; the hydraulic numbers do not, because the
+  live deployment switches those steps off in its own config (`/api/vent/meta`
+  → `modes: tP/t7/t8/t9 = "off"`) and the server returns the segment tree with
+  every value `null`. The engine keeps the empty stub (`H`, `P`, `FN`, `CK`).
 - No licence logic: `mode` is always `free`, every feature is unlocked.
 
 ## Build
@@ -31,21 +34,25 @@ Rust 1.77+.
 
 ```sh
 cargo test -p engine      # parity suite
-cargo run -p dh-vent      # desktop app (Linux needs webkit2gtk-4.1 and gtk3)
+cargo run -p vent         # desktop app (Linux needs webkit2gtk-4.1 and gtk3)
 cargo tauri build         # installer for the current OS
 ```
 
-Windows installers are built by GitHub Actions on every push to `main`
-(`.github/workflows/windows.yml`). Download the `dh-vent-windows` artifact from
-the run, or build on Windows with:
+Both platforms are built by GitHub Actions on every push to `main`
+(`.github/workflows/build.yml`): `vent-linux` (deb, rpm, AppImage) and
+`vent-windows` (msi, nsis) artifacts.
 
-```sh
-cargo install tauri-cli --version "^2" --locked
-cargo tauri build
-```
+Outputs on Linux: `target/release/bundle/deb/VENT_1.0.0_amd64.deb`,
+`target/release/bundle/rpm/VENT-1.0.0-1.x86_64.rpm`,
+`target/release/bundle/appimage/VENT_1.0.0_amd64.AppImage`
+(`cargo tauri build --bundles deb,rpm`). AppImage needs linuxdeploy's bundled
+`strip` to understand the distribution's binaries; it works on the Ubuntu CI
+runner but fails on Arch (`.relr.dyn` sections).
 
-Outputs: `target/release/bundle/msi/DH-VENT_1.0.0_x64_en-US.msi` and
-`target/release/bundle/nsis/DH-VENT_1.0.0_x64-setup.exe`.
+Outputs on Windows: `target/release/bundle/msi/VENT_1.0.0_x64_en-US.msi` and
+`target/release/bundle/nsis/VENT_1.0.0_x64-setup.exe`
+(`cargo tauri build --bundles msi,nsis`, needs the Windows WebView2 runtime,
+installed by the bundle when missing).
 
 ## Extending
 
@@ -68,5 +75,6 @@ Outputs: `target/release/bundle/msi/DH-VENT_1.0.0_x64_en-US.msi` and
 - Formulas and defaults were recovered from the page's calculation notes and by
   probing the live compute endpoint; `engine/src` documents each stage.
 
-Original app, data and texts © Nguyễn Đình Huấn (ndhuan@dut.udn.vn). This is a
-private study copy, not affiliated with or endorsed by the author.
+Forked and rebranded from **DH-VENT** by Nguyễn Đình Huấn with the author's
+permission (recorded here, 2026). Upstream: ndhuan@dut.udn.vn. This fork is not
+affiliated with or endorsed by him beyond that permission.

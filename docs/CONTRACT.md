@@ -1,6 +1,6 @@
 # Engine contract
 
-The UI is unchanged: it calls `DH.compute(input)` and expects the same response
+The UI is unchanged: it calls `APP.compute(input)` and expects the same response
 envelope the web API used to return. In the desktop app that call is a Tauri
 command, not HTTP.
 

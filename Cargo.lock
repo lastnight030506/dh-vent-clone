@@ -567,16 +567,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "dh-vent"
-version = "1.0.0"
-dependencies = [
- "engine",
- "serde_json",
- "tauri",
- "tauri-build",
-]
-
-[[package]]
 name = "digest"
 version = "0.10.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3629,6 +3619,16 @@ dependencies = [
  "js-sys",
  "serde_core",
  "wasm-bindgen",
+]
+
+[[package]]
+name = "vent"
+version = "1.0.0"
+dependencies = [
+ "engine",
+ "serde_json",
+ "tauri",
+ "tauri-build",
 ]
 
 [[package]]
