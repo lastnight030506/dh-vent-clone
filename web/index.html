@@ -682,6 +682,19 @@ function extents() {
   return { x0: Math.min(...xs), y0: Math.min(...ys), x1: Math.max(...xs), y1: Math.max(...ys) };
 }
 function boxOf() { const p = plan(); if (p.box) return p.box; const k = p.k || 1; return { x0: 0, y0: 0, x1: (+S.bA || 30) / k, y1: (+S.bB || 24) / k }; }
+function boxHit(pt) {
+  const p = plan(); if (PL.tool !== 'sel' || (PL.bg && !p.box)) return null;
+  const b = boxOf(), tol = 8 * pxu();
+  const hs = [
+    { k: 'nw', x: b.x0, y: b.y0 }, { k: 'n', x: (b.x0 + b.x1) / 2, y: b.y0 }, { k: 'ne', x: b.x1, y: b.y0 },
+    { k: 'e', x: b.x1, y: (b.y0 + b.y1) / 2 }, { k: 'se', x: b.x1, y: b.y1 }, { k: 's', x: (b.x0 + b.x1) / 2, y: b.y1 },
+    { k: 'sw', x: b.x0, y: b.y1 }, { k: 'w', x: b.x0, y: (b.y0 + b.y1) / 2 }
+  ];
+  for (const h of hs) {
+    if (Math.hypot(pt.x - h.x, pt.y - h.y) <= tol) return h.k;
+  }
+  return null;
+}
 function fitView() {
   if (!PSV || !PSV.clientWidth) { PL.view = null; return; }
   const e = extents(), W = PSV.clientWidth, H = PSV.clientHeight, m = 0.06;
@@ -824,9 +837,13 @@ function snapOrtho(from, pt) { if (!from || plan().ortho === false) return pt; r
 function onDown(ev) {
   if (!PL.view) { fitView(); if (!PL.view) return; }
   if (ev.button === 2) return;
-  const p = plan(), pt = world(ev), h = hit(pt), t = PL.tool;
+  const p = plan(), pt = world(ev), h = hit(pt), t = PL.tool, bh = t === 'sel' ? boxHit(pt) : null;
   PSV.setPointerCapture(ev.pointerId);
   if (ev.button === 1 || PL.space) { PL.drag = { pan: true, sx: ev.clientX, sy: ev.clientY, vx: PL.view.x, vy: PL.view.y }; return; }
+  if (bh) {
+    pushUndo(); const b0 = { ...boxOf() }, created = !p.box; if (created) p.box = { ...b0 };
+    PL.drag = { boxRz: bh, b0, created, start: pt, moved: false }; return;
+  }
   if (t === 'sel') {
     if (h && (h.node || h.edge)) {
       const ids = h.node ? { n: [h.node.id], e: [] } : { n: [], e: [ekey(h.edge.e)] };
@@ -887,6 +904,16 @@ function onDown(ev) {
 function onMove(ev) {
   if (!PL.view) return;
   const pt = world(ev);
+  if (PL.drag && PL.drag.boxRz) {
+    const D = PL.drag, p = plan(), dx = pt.x - D.start.x, dy = pt.y - D.start.y, k = D.boxRz, minSz = 0.5;
+    let { x0, y0, x1, y1 } = D.b0;
+    if (k.includes('w')) x0 = Math.min(x0 + dx, x1 - minSz);
+    if (k.includes('e')) x1 = Math.max(x1 + dx, x0 + minSz);
+    if (k.includes('n')) y0 = Math.min(y0 + dy, y1 - minSz);
+    if (k.includes('s')) y1 = Math.max(y1 + dy, y0 + minSz);
+    p.box = { x0: +x0.toFixed(4), y0: +y0.toFixed(4), x1: +x1.toFixed(4), y1: +y1.toFixed(4) };
+    D.moved = true; drawPlan(); return;
+  }
   if (PL.drag && PL.drag.pan) { const s = pxu(); PL.view.x = PL.drag.vx - (ev.clientX - PL.drag.sx) * s; PL.view.y = PL.drag.vy - (ev.clientY - PL.drag.sy) * s; drawPlan(); return; }
   if (PL.box) { PL.box.x1 = pt.x; PL.box.y1 = pt.y; drawPlan(); return; }
   if (PL.drag && PL.drag.move) {
@@ -898,9 +925,17 @@ function onMove(ev) {
     }
     moveSel(dx - D.last.x, dy - D.last.y); D.last = { x: dx, y: dy }; D.moved = true; drawPlan(); return;
   }
+  if (PSV && !PL.drag) {
+    const bh = boxHit(pt);
+    PSV.style.cursor = bh ? (bh === 'n' || bh === 's' ? 'ns-resize' : bh === 'e' || bh === 'w' ? 'ew-resize' : bh === 'nw' || bh === 'se' ? 'nwse-resize' : 'nesw-resize') : '';
+  }
   PL.hover = pt; if (PL.chain || PL.pick.length) drawPlan();
 }
 function onUp(ev) {
+  if (PL.drag && PL.drag.boxRz) {
+    if (PL.drag.moved) commit(); else { PL.undo.pop(); if (PL.drag.created) plan().box = null; }
+    PL.drag = null; if (PSV) PSV.style.cursor = ''; drawPlan(); return;
+  }
   if (PL.box) { boxSelect(PL.box); PL.box = null; selUI(); drawPlan(); return; }
   if (PL.drag && PL.drag.move) { if (PL.drag.moved) commit(); else { PL.undo.pop(); if (PL.drag.single) { PL.sel = PL.drag.single.id; nodePanel(); drawIso(); } drawPlan(); } }
   PL.drag = null;
@@ -1082,7 +1117,19 @@ function drawPlan() {
     const st = 1 / (p.k || 1), x0 = Math.floor(v.x / st) * st, y0 = Math.floor(v.y / st) * st, x1 = v.x + v.w, y1 = v.y + v.w * H / W;
     if ((x1 - x0) / st < 400) { let gl = ''; for (let x = x0; x <= x1; x += st) gl += `M${x} ${y0}V${y1}`; for (let y = y0; y <= y1; y += st) gl += `M${x0} ${y}H${x1}`; g += `<path d="${gl}" stroke="var(--line2)" stroke-width="${s}"/>`; }
   }
-  if (!PL.bg || p.box) g += `<rect x="${bx.x0}" y="${bx.y0}" width="${bx.x1 - bx.x0}" height="${bx.y1 - bx.y0}" fill="none" stroke="var(--steel)" stroke-width="${2.2 * s}" stroke-dasharray="${8 * s} ${5 * s}"/>`;
+  if (!PL.bg || p.box) {
+    g += `<rect x="${bx.x0}" y="${bx.y0}" width="${bx.x1 - bx.x0}" height="${bx.y1 - bx.y0}" fill="none" stroke="var(--steel)" stroke-width="${2.2 * s}" stroke-dasharray="${8 * s} ${5 * s}"/>`;
+    if (PL.tool === 'sel') {
+      const hs = [
+        [bx.x0, bx.y0], [(bx.x0 + bx.x1) / 2, bx.y0], [bx.x1, bx.y0],
+        [bx.x1, (bx.y0 + bx.y1) / 2], [bx.x1, bx.y1], [(bx.x0 + bx.x1) / 2, bx.y1],
+        [bx.x0, bx.y1], [bx.x0, (bx.y0 + bx.y1) / 2]
+      ], sz = 7 * s;
+      hs.forEach(([hx, hy]) => {
+        g += `<rect x="${hx - sz / 2}" y="${hy - sz / 2}" width="${sz}" height="${sz}" fill="var(--panel)" stroke="var(--steel)" stroke-width="${1.4 * s}"/>`;
+      });
+    }
+  }
   // ống
   const H2 = R && R.H && !R.H.err.length ? R.H : null;
   const mainSet = new Set(H2 ? H2.critPath.map(x => x.name) : []), maxSet = new Set(H2 && H2.maxLeaf !== H2.crit ? H2.maxLeaf.path.map(x => x.name) : []);
@@ -2637,6 +2684,171 @@ APP.boot(META => {
   if (META.cfg) CFG = { modes: META.cfg.modes || {}, tol: META.cfg.tol || 3 };
   renderAll(); applyMode(); showTab(tab); run();
 });
+
+/* ---------- Generic DOM Resizer (8 hướng: n/s/e/w + 4 góc) ---------- */
+(() => {
+  if (!window.matchMedia || !window.matchMedia('(pointer:fine)').matches) return;
+  const RZ_KEY = 'vent-v1.rz';
+  let store = {};
+  try { store = JSON.parse(localStorage.getItem(RZ_KEY)) || {}; } catch (e) { store = {}; }
+  function saveStore() { try { localStorage.setItem(RZ_KEY, JSON.stringify(store)); } catch (e) {} }
+
+  function elKey(el) {
+    if (el.id) return '#' + el.id;
+    if (el.dataset && el.dataset.k) return 'k:' + el.dataset.k;
+    const sec = el.closest('section');
+    const tabId = sec ? sec.id : 'g';
+    const tag = el.tagName.toLowerCase();
+    const all = sec ? Array.from(sec.querySelectorAll(tag)) : Array.from(document.querySelectorAll(tag));
+    return `${tabId}:${tag}:${all.indexOf(el)}`;
+  }
+
+  function canResize(el) {
+    if (!el || !el.matches) return false;
+    if (el.matches('.card, .svgbox, .plbox')) return true;
+    if (el.matches('select')) return false;   // native dropdown arrow sits in the right edge band
+    if (el.matches('input, textarea')) {
+      if (el.disabled || el.readOnly || el.type === 'hidden') return false;
+      if (/^(checkbox|radio|file|button|submit|reset|image|range)$/i.test(el.type || '')) return false;
+      return true;
+    }
+    return false;
+  }
+
+  function applySize(el, s) {
+    if (!s) {
+      el.style.width = ''; el.style.height = ''; el.style.marginLeft = ''; el.style.marginTop = ''; el.style.minWidth = ''; el.style.minHeight = '';
+      if (el.matches('.card')) { el.style.justifySelf = ''; el.style.overflow = ''; }
+      if (el.matches('.plbox')) { const svg = el.querySelector('svg'); if (svg) svg.style.height = ''; }
+      return;
+    }
+    if (s.w != null) el.style.width = s.w + 'px';
+    if (s.h != null) el.style.height = s.h + 'px';
+    if (s.ml != null) el.style.marginLeft = s.ml + 'px';
+    if (s.mt != null) el.style.marginTop = s.mt + 'px';
+    el.style.minWidth = '0'; el.style.minHeight = '0';
+    if (el.matches('.card')) { el.style.justifySelf = s.w != null ? 'start' : ''; el.style.overflow = 'auto'; }
+    if (el.matches('.plbox')) { const svg = el.querySelector('svg'); if (svg) svg.style.height = '100%'; }
+  }
+
+  function getDir(el, ev) {
+    const r = el.getBoundingClientRect(), x = ev.clientX, y = ev.clientY;
+    const pad = 6, cpad = 8;
+    const onL = x >= r.left && x <= r.left + pad, onR = x >= r.right - pad && x <= r.right;
+    const onT = y >= r.top && y <= r.top + pad, onB = y >= r.bottom - pad && y <= r.bottom;
+    const cL = x >= r.left && x <= r.left + cpad, cR = x >= r.right - cpad && x <= r.right;
+    const cT = y >= r.top && y <= r.top + cpad, cB = y >= r.bottom - cpad && y <= r.bottom;
+    let d = '';
+    if (cT && (cL || cR)) d += 'n'; else if (cB && (cL || cR)) d += 's'; else if (onT) d += 'n'; else if (onB) d += 's';
+    if (cL && (cT || cB)) d += 'w'; else if (cR && (cT || cB)) d += 'e'; else if (onL) d += 'w'; else if (onR) d += 'e';
+    return d;
+  }
+
+  const CURSORS = { n: 'ns-resize', s: 'ns-resize', e: 'ew-resize', w: 'ew-resize', nw: 'nwse-resize', se: 'nwse-resize', ne: 'nesw-resize', sw: 'nesw-resize' };
+  let active = null, hovered = null, lastTap = null;
+
+  document.addEventListener('pointermove', e => {
+    if (active) {
+      active.moved = true;
+      const { el, dir, r0, px, py, ml0, mt0, minW, minH } = active;
+      let w = r0.width, h = r0.height, ml = ml0, mt = mt0, dx = e.clientX - px, dy = e.clientY - py;
+      if (dir.includes('e')) w = Math.max(minW, r0.width + dx);
+      if (dir.includes('s')) h = Math.max(minH, r0.height + dy);
+      if (dir.includes('w')) {
+        const nw = Math.max(minW, r0.width - dx);
+        ml = ml0 + (r0.width - nw); w = nw;
+      }
+      if (dir.includes('n')) {
+        const nh = Math.max(minH, r0.height - dy);
+        mt = mt0 + (r0.height - nh); h = nh;
+      }
+      applySize(el, { w: Math.round(w), h: Math.round(h), ml: Math.round(ml), mt: Math.round(mt) });
+      if (el.matches('.plbox') && typeof drawPlan === 'function') drawPlan();
+      return;
+    }
+    const target = e.target && e.target.closest && e.target.closest('.card, .svgbox, .plbox, input, select, textarea');
+    if (target && canResize(target)) {
+      const d = getDir(target, e);
+      if (d) {
+        if (hovered && hovered.el !== target) hovered.el.style.cursor = '';
+        target.style.cursor = CURSORS[d];
+        hovered = { el: target, dir: d };
+        return;
+      }
+    }
+    if (hovered) { hovered.el.style.cursor = ''; hovered = null; }
+  }, true);
+
+  document.addEventListener('pointerdown', e => {
+    if (e.button !== 0) return;
+    const target = e.target && e.target.closest && e.target.closest('.card, .svgbox, .plbox, input, select, textarea');
+    if (!target || !canResize(target)) return;
+    const d = getDir(target, e);
+    if (!d) return;
+    e.preventDefault(); e.stopPropagation();
+    const now = Date.now(), x = e.clientX, y = e.clientY;
+    if (lastTap && lastTap.el === target && now - lastTap.t < 400 && Math.hypot(x - lastTap.x, y - lastTap.y) < 8) {
+      lastTap = null;
+      const k = elKey(target);
+      delete store[k];
+      saveStore();
+      applySize(target, null);
+      target.style.cursor = '';
+      if (hovered && hovered.el === target) hovered = null;
+      if (target.matches('.plbox') && typeof drawPlan === 'function') drawPlan();
+      return;
+    }
+    lastTap = { el: target, t: now, x, y };
+    try { target.setPointerCapture(e.pointerId); } catch (x) {}
+    const r0 = target.getBoundingClientRect(), cs = window.getComputedStyle(target);
+    const ml0 = parseFloat(cs.marginLeft) || 0, mt0 = parseFloat(cs.marginTop) || 0;
+    const isField = target.matches('input, select, textarea');
+    active = {
+      el: target, pid: e.pointerId, dir: d, r0, px: e.clientX, py: e.clientY,
+      ml0, mt0, minW: isField ? 48 : 80, minH: isField ? 24 : 60, moved: false
+    };
+  }, true);
+
+  function endResize(e) {
+    if (!active || (e.pointerId != null && active.pid !== e.pointerId)) return;
+    const { el, moved } = active;
+    try { el.releasePointerCapture(active.pid); } catch (x) {}
+    el.style.cursor = '';
+    if (hovered && hovered.el === el) hovered = null;
+    if (!moved) { active = null; return; }
+    active = null;
+    const k = elKey(el);
+    const w = parseFloat(el.style.width), h = parseFloat(el.style.height);
+    const ml = parseFloat(el.style.marginLeft) || 0, mt = parseFloat(el.style.marginTop) || 0;
+    store[k] = { w, h, ml, mt };
+    saveStore();
+    if (el.matches('.plbox') && typeof drawPlan === 'function') drawPlan();
+  }
+  document.addEventListener('pointerup', endResize, true);
+  document.addEventListener('pointercancel', endResize, true);
+
+  function reapplyAll() {
+    const main = document.querySelector('main'); if (!main) return;
+    const els = main.querySelectorAll('.card, .svgbox, .plbox, input, select, textarea');
+    els.forEach(el => {
+      if (!canResize(el)) return;
+      if (active && el === active.el) return;
+      const k = elKey(el), s = store[k];
+      if (s) applySize(el, s);
+    });
+  }
+
+  let raf = null;
+  const obs = new MutationObserver(muts => {
+    const plSvg = document.getElementById('plSvg');
+    if (plSvg && muts.every(m => plSvg.contains(m.target))) return;
+    if (raf) cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(() => { raf = null; reapplyAll(); });
+  });
+  const main = document.querySelector('main');
+  if (main) obs.observe(main, { childList: true, subtree: true });
+  setTimeout(reapplyAll, 0);
+})();
 
 </script>
 
