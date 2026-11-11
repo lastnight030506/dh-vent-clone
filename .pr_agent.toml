@@ -1,0 +1,13 @@
+[config]
+model = "deepseek/deepseek-chat"
+custom_model_max_tokens = 65536   # DeepSeek 64k context; only caps input size
+
+[pr_reviewer]
+extra_instructions = "Focus on correctness, security, and data-loss risks. Skip pure style nits."
+num_max_findings = 5
+
+[pr_description]
+generate_ai_title = false
+
+[ignore]
+glob = ["*.lock", "*-lock.json", "target/**", "dist/**", "__pycache__/**", ".mypy_cache/**", ".pytest_cache/**"]
