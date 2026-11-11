@@ -1,5 +1,5 @@
 [config]
-model = "deepseek/deepseek-chat"
+model = "openai/deepseek-v4-pro"
 custom_model_max_tokens = 65536   # DeepSeek 64k context; only caps input size
 
 [pr_reviewer]

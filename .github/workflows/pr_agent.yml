@@ -17,5 +17,6 @@ jobs:
         id: pragent
         uses: the-pr-agent/pr-agent@main
         env:
-          DEEPSEEK__KEY: ${{ secrets.DEEPSEEK_KEY }}
+          OPENAI__API_BASE: https://opencode.ai/inference/openai/v1
+          OPENAI__KEY: ${{ secrets.OPENCODE_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
