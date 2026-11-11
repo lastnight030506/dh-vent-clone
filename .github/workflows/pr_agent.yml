@@ -17,6 +17,7 @@ jobs:
         id: pragent
         uses: the-pr-agent/pr-agent@main
         env:
-          OPENAI__API_BASE: https://opencode.ai/inference/openai/v1
+          OPENAI__API_BASE: https://opencode.ai/inference/go/openai/v1
           OPENAI__KEY: ${{ secrets.OPENCODE_KEY }}
+          LITELLM__EXTRA_HEADERS: '{"x-opencode-session": "pr-agent"}'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
